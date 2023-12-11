@@ -6,17 +6,20 @@ export declare class Stumblechat {
     _jar: any;
     _csrf: string;
     _userAgent: string;
+    _room: any;
     constructor(o?: any);
     _makeAgent(): SocksProxyAgent | HttpsProxyAgent<any>;
     toObject(): {
         jar: any;
         csrf: string;
         userAgent: string;
+        room: any;
     };
-    static fromObject({ jar, csrf, userAgent }: {
+    static fromObject({ jar, csrf, userAgent, room }: {
         jar: any;
         csrf: any;
         userAgent: any;
+        room: any;
     }): Stumblechat;
     static fromJSON(s: string): Stumblechat;
     toJSON(): string;
@@ -26,4 +29,5 @@ export declare class Stumblechat {
     chooseRoom({ room }: {
         room: any;
     }): Promise<any>;
+    attach(): Promise<unknown>;
 }
