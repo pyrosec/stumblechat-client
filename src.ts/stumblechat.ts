@@ -149,7 +149,8 @@ export class Stumblechat {
     };
     return responseJson;
   }
-  async attach() {
+  async attach({ handler }) {
+    handler = handler || (() => {});
     const ws = new WebSocket(this._room.endpoint, {
       headers: {
         Cookie: (await this._jar.getCookies(this._room.endpoint)).toString(),
@@ -173,8 +174,9 @@ export class Stumblechat {
           }),
         );
         ws.on("message", (msg) => {
-          if (process.env.PRETTY_PRINT) logger.info(JSON.parse(msg));
-          else console.log(JSON.stringify(JSON.parse(msg)));
+          if (Number(msg) === 0) ws.send('0');
+          logger.info(JSON.parse(msg));
+          (handler as any)(JSON.parse(msg));
         });
       });
     });

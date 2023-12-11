@@ -29,5 +29,7 @@ export declare class Stumblechat {
     chooseRoom({ room }: {
         room: any;
     }): Promise<any>;
-    attach(): Promise<unknown>;
+    attach({ handler }: {
+        handler: any;
+    }): Promise<unknown>;
 }
