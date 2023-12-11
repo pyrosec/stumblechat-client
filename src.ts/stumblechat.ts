@@ -32,6 +32,7 @@ export class Stumblechat {
   public _userAgent: string;
   public _room: any;
   public _ws: any;
+  public _username: string;
   constructor(o?: any) {
     o = o || {};
     this._jar = o.jar || new makeFetchCookie.toughCookie.CookieJar();
@@ -115,6 +116,7 @@ export class Stumblechat {
       method: "POST",
     });
     const responseJson = await response.json();
+    this._username = username;
     return responseJson;
   }
   async chooseRoom({ room }) {
@@ -150,8 +152,9 @@ export class Stumblechat {
     };
     return responseJson;
   }
-  async attach({ handler }) {
+  async attach({ handler, username }) {
     handler = handler || (() => {});
+    username = username || this._username;
     const ws = new WebSocket(this._room.endpoint, {
       headers: {
         Cookie: (await this._jar.getCookies(this._room.endpoint)).toString(),
@@ -172,7 +175,7 @@ export class Stumblechat {
             stumble: "join",
             token: this._room.token,
             room: this._room.room,
-            nick: "",
+            nick: username,
           }),
         );
         ws.on("message", (msg) => {
