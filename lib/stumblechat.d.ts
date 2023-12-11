@@ -7,6 +7,7 @@ export declare class Stumblechat {
     _csrf: string;
     _userAgent: string;
     _room: any;
+    _ws: any;
     constructor(o?: any);
     _makeAgent(): SocksProxyAgent | HttpsProxyAgent<any>;
     toObject(): {
@@ -32,4 +33,5 @@ export declare class Stumblechat {
     attach({ handler }: {
         handler: any;
     }): Promise<unknown>;
+    send(msg: any): void;
 }

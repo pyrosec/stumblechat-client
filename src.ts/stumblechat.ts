@@ -31,6 +31,7 @@ export class Stumblechat {
   public _csrf: string;
   public _userAgent: string;
   public _room: any;
+  public _ws: any;
   constructor(o?: any) {
     o = o || {};
     this._jar = o.jar || new makeFetchCookie.toughCookie.CookieJar();
@@ -163,6 +164,7 @@ export class Stumblechat {
       },
       agent: this._makeAgent()
     });
+    this._ws = ws;
     return await new Promise(() => {
       ws.on("open", () => {
         ws.send(
@@ -180,5 +182,8 @@ export class Stumblechat {
         });
       });
     });
+  }
+  send(msg) {
+    this._ws.send(msg);
   }
 }
