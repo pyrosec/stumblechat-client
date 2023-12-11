@@ -150,7 +150,18 @@ export class Stumblechat {
     return responseJson;
   }
   async attach() {
-    const ws = new WebSocket(this._room.endpoint);
+    const ws = new WebSocket(this._room.endpoint, {
+      headers: {
+        Cookie: (await this._jar.getCookies(this._room.endpoint)).toString(),
+        "accept-language": "en-US,en;q=0.9",
+        "cache-control": "no-cache",
+        pragma: "no-cache",
+        "sec-websocket-extensions":
+          "permessage-deflate; client_max_window_bits",
+        "sec-websocket-version": "13",
+      },
+      agent: this._makeAgent()
+    });
     return await new Promise(() => {
       ws.on("open", () => {
         ws.send(
