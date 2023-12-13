@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import util from "util";
 import url from "url";
 import "setimmediate";
-import mkdirp from "mkdirp"
+import { mkdirp } from "mkdirp"
 import path from "path";
 import { getLogger } from "./logger";
 

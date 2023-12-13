@@ -179,7 +179,9 @@ export class Stumblechat {
           }),
         );
         ws.on("message", (msg) => {
-          if (Number(msg) === 0) ws.send('0');
+          if (String(msg).trim() == '0') ws.send('0');
+        });
+        ws.on("message", (msg) => {
           logger.info(JSON.parse(msg));
           (handler as any)(JSON.parse(msg));
         });
