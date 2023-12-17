@@ -1,10 +1,4 @@
-/// <reference types="node" />
-import events from "events";
-export declare class EnhancedEventEmitter extends events.EventEmitter {
-    constructor();
-    safeEmit(event: any, ...args: any[]): boolean;
-    safeEmitAsPromise(event: any, ...args: any[]): Promise<unknown>;
-}
+import { EnhancedEventEmitter } from "./events";
 declare class HandlerInterface extends EnhancedEventEmitter {
     constructor();
 }

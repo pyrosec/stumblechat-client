@@ -5,32 +5,9 @@ import { RemoteSdp } from "./sdp";
 import * as ortc from "./ortc";
 import * as utils from "./utils";
 import wrtc from "wrtc";
+import { EnhancedEventEmitter } from "./events";
 const { clone } = utils;
 const logger = getLogger();
-export class EnhancedEventEmitter extends events.EventEmitter {
-  constructor() {
-    super();
-    this.setMaxListeners(Infinity);
-  }
-  safeEmit(event, ...args) {
-    const numListeners = this.listenerCount(event);
-    try {
-      return this.emit(event, ...args);
-    } catch (error) {
-      logger.error(
-        "safeEmit() | event listener threw an error [event:%s]:%o",
-        event,
-        error,
-      );
-      return Boolean(numListeners);
-    }
-  }
-  async safeEmitAsPromise(event, ...args) {
-    return new Promise((resolve, reject) => {
-      this.safeEmit(event, ...args, resolve, reject);
-    });
-  }
-}
 class HandlerInterface extends EnhancedEventEmitter {
   constructor() {
     super();
@@ -68,7 +45,7 @@ export class NodeHandler extends HandlerInterface {
     return () => new NodeHandler();
   }
   get name() {
-    return "Chrome55";
+    return "NodeJS";
   }
   close() {
     logger.debug("close()");
