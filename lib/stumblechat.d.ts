@@ -35,5 +35,17 @@ export declare class Stumblechat {
         handler: any;
         username: any;
     }): Promise<unknown>;
+    register({ day, month, year, email, username, password }: {
+        day: any;
+        month: any;
+        year: any;
+        email: any;
+        username: any;
+        password: any;
+    }): Promise<any>;
+    verify({ token }: {
+        token: any;
+    }): Promise<any>;
+    getRooms(): Promise<any[]>;
     send(msg: any): void;
 }

@@ -155,21 +155,35 @@ export class Stumblechat {
   async attach({ handler, username }) {
     handler = handler || (() => {});
     username = username || this._username;
-    const ws = new WebSocket(this._room.endpoint, {
-      headers: {
-        Cookie: (await this._jar.getCookies(this._room.endpoint)).toString(),
-        "accept-language": "en-US,en;q=0.9",
-        "cache-control": "no-cache",
-        pragma: "no-cache",
-        "sec-websocket-extensions":
-          "permessage-deflate; client_max_window_bits",
-        "sec-websocket-version": "13",
+    let Cookie = null;
+    try {
+      Cookie = String(
+        await this._jar.getCookies(
+          this._room.endpoint || "https://wss2.stumblechat.com",
+        ),
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    const ws = new WebSocket(
+      this._room.endpoint || "https://wss2.stumblechat.com",
+      {
+        headers: {
+          Cookie,
+          "accept-language": "en-US,en;q=0.9",
+          "cache-control": "no-cache",
+          pragma: "no-cache",
+          "sec-websocket-extensions":
+            "permessage-deflate; client_max_window_bits",
+          "sec-websocket-version": "13",
+        },
+        agent: this._makeAgent(),
       },
-      agent: this._makeAgent()
-    });
+    );
     this._ws = ws;
-    return await new Promise(() => {
+    return await new Promise((resolve) => {
       ws.on("open", () => {
+        resolve(this);
         ws.send(
           JSON.stringify({
             stumble: "join",
@@ -179,7 +193,7 @@ export class Stumblechat {
           }),
         );
         ws.on("message", (msg) => {
-          if (String(msg).trim() == '0') ws.send('0');
+          if (String(msg).trim() == "0") ws.send("0");
         });
         ws.on("message", (msg) => {
           logger.info(JSON.parse(msg));
@@ -187,6 +201,105 @@ export class Stumblechat {
         });
       });
     });
+  }
+  async register({
+    day,
+    month,
+    year,
+    email,
+    username,
+    password
+  }) {
+    await this.fetchText("https://stumblechat.com/register");
+    const responseText = await (
+      await this._call("https://stumblechat.com/account/register", {
+        headers: {
+          accept: "*/*",
+          "accept-language": "en-US,en;q=0.9",
+          "content-type": "application/json;charset=UTF-8",
+          "csrf-token": this._csrf,
+          "sec-ch-ua":
+            '"Chromium";v="112", "Google Chrome";v="112", ";Not A Brand";v="99"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          Referer: "https://stumblechat.com/register",
+          "Referrer-Policy": "strict-origin-when-cross-origin",
+        },
+        body: JSON.stringify({
+          day: day || "01",
+          month: month || "01",
+          year: year || "1985",
+          password,
+          confirm: password,
+          username,
+          email,
+        }),
+        method: "POST",
+      })
+    ).text();
+    const response = JSON.parse(responseText);
+    return response;
+  }
+  async verify({ token }) {
+    await this.fetchText("https://stumblechat.com/verify");
+    const responseText = await (
+      await this._call("https://stumblechat.com/account/verify", {
+        headers: {
+          accept: "*/*",
+          "accept-language": "en-US,en;q=0.9",
+          "content-type": "application/json;charset=UTF-8",
+          "csrf-token": this._csrf,
+          "sec-ch-ua":
+            '"Chromium";v="112", "Google Chrome";v="112", ";Not A Brand";v="99"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          Referer: "https://stumblechat.com/verify",
+          "Referrer-Policy": "strict-origin-when-cross-origin",
+        },
+        body: JSON.stringify({ token }),
+        method: "POST",
+      })
+    ).text();
+    const response = JSON.parse(responseText);
+    return response;
+  }
+
+  async getRooms() {
+    await this.fetchText("https://stumblechat.com");
+    let currentPage = 1;
+    let results = [];
+    while (true) {
+      const resultText = await (
+        await this._call("https://stumblechat.com/lbstats", {
+          headers: {
+            accept: "*/*",
+            "accept-language": "en-US,en;q=0.9",
+            "content-type": "application/x-www-form-urlencoded",
+            "csrf-token": this._csrf,
+            "sec-ch-ua":
+              '"Chromium";v="112", "Google Chrome";v="112", ";Not A Brand";v="99"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            Referer: "https://stumblechat.com/",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+          },
+          body: "page=" + String(currentPage),
+          method: "POST",
+        })
+      ).text();
+      const result = JSON.parse(resultText);
+      results = results.concat(result.rooms);
+      if (result.totalPages === result.currentPage) return results;
+      currentPage++;
+    }
   }
   send(msg) {
     this._ws.send(msg);

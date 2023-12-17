@@ -37,7 +37,7 @@ const customFormatter = ({ level, message, label, timestamp }) => {
   }`;
 };
 
-const createLogger = (proc?: string) => {
+export const createLogger = (proc?: string) => {
   addColors(customColors);
   const logger = createWinstonLogger({
     defaultMeta: {
