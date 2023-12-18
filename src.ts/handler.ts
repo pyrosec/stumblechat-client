@@ -456,8 +456,9 @@ export class NodeHandler extends HandlerInterface {
       answer,
     );
     await this._pc.setLocalDescription(answer);
-    const stream = this._pc.getRemoteStreams().find((s) => s.id === streamId);
-    const track = stream.getTrackById(localId);
+    
+    const track = this._pc.getReceivers()[0].track;
+    const [ rtpReceiver ] = this._pc.getReceivers();
     if (!track) throw new Error("remote track not found");
     this._mapRecvLocalIdInfo.set(localId, {
       mid,
@@ -465,6 +466,7 @@ export class NodeHandler extends HandlerInterface {
     });
     return {
       localId,
+      rtpReceiver,
       track,
     };
   }

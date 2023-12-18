@@ -81,6 +81,7 @@ export declare class NodeHandler extends HandlerInterface {
         rtpParameters: any;
     }): Promise<{
         localId: any;
+        rtpReceiver: any;
         track: any;
     }>;
     stopReceiving(localId: any): Promise<void>;

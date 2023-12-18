@@ -1,4 +1,4 @@
-import awaitqueue from "awaitqueue";
+import { AwaitQueue } from "awaitqueue";
 import { EnhancedEventEmitter } from "./events";
 import * as utils from "./utils";
 import * as ortc from "./ortc";
@@ -553,7 +553,7 @@ export class Transport extends EnhancedEventEmitter {
     this._dataProducers = new Map();
     this._dataConsumers = new Map();
     this._probatorConsumerCreated = false;
-    this._awaitQueue = new awaitqueue.AwaitQueue();
+    this._awaitQueue = new AwaitQueue();
     logger.debug("constructor() [id:%s, direction:%s]", id, direction);
     this._id = id;
     this._direction = direction;
@@ -666,11 +666,6 @@ export class Transport extends EnhancedEventEmitter {
     else if (!this._canProduceByKind[track.kind])
       throw new Error(`cannot produce ${track.kind}`);
     else if (track.readyState === "ended") throw new Error("track ended");
-    else if (
-      this.listenerCount("connect") === 0 &&
-      this._connectionState === "new"
-    )
-      throw new TypeError('no "connect" listener set into this transport');
     else if (this.listenerCount("produce") === 0)
       throw new TypeError('no "produce" listener set into this transport');
     else if (appData && typeof appData !== "object")
@@ -758,11 +753,6 @@ export class Transport extends EnhancedEventEmitter {
       throw new TypeError("missing producerId");
     else if (kind !== "audio" && kind !== "video")
       throw new TypeError(`invalid kind '${kind}'`);
-    else if (
-      this.listenerCount("connect") === 0 &&
-      this._connectionState === "new"
-    )
-      throw new TypeError('no "connect" listener set into this transport');
     else if (appData && typeof appData !== "object")
       throw new TypeError("if given, appData must be an object");
     return this._awaitQueue.push(async () => {
@@ -824,11 +814,6 @@ export class Transport extends EnhancedEventEmitter {
       throw new Error("SCTP not enabled by remote Transport");
     else if (!["very-low", "low", "medium", "high"].includes(priority))
       throw new TypeError("wrong priority");
-    else if (
-      this.listenerCount("connect") === 0 &&
-      this._connectionState === "new"
-    )
-      throw new TypeError('no "connect" listener set into this transport');
     else if (this.listenerCount("producedata") === 0)
       throw new TypeError('no "producedata" listener set into this transport');
     else if (appData && typeof appData !== "object")
@@ -879,11 +864,6 @@ export class Transport extends EnhancedEventEmitter {
     else if (typeof id !== "string") throw new TypeError("missing id");
     else if (typeof dataProducerId !== "string")
       throw new TypeError("missing dataProducerId");
-    else if (
-      this.listenerCount("connect") === 0 &&
-      this._connectionState === "new"
-    )
-      throw new TypeError('no "connect" listener set into this transport');
     else if (appData && typeof appData !== "object")
       throw new TypeError("if given, appData must be an object");
     ortc.validateSctpStreamParameters(sctpStreamParameters);

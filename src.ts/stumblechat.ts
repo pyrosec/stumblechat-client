@@ -33,11 +33,13 @@ export class Stumblechat {
   public _room: any;
   public _ws: any;
   public _username: string;
+  public _logger: any;
   constructor(o?: any) {
     o = o || {};
     this._jar = o.jar || new makeFetchCookie.toughCookie.CookieJar();
     this._csrf = o.csrf || null;
     this._room = o.room || null;
+    this._logger = logger;
     this._userAgent = o.userAgent || random();
   }
   _makeAgent() {
@@ -196,7 +198,7 @@ export class Stumblechat {
           if (String(msg).trim() == "0") ws.send("0");
         });
         ws.on("message", (msg) => {
-          logger.info(JSON.parse(msg));
+          this._logger.info(JSON.parse(msg));
           (handler as any)(JSON.parse(msg));
         });
       });

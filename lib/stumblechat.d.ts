@@ -9,6 +9,7 @@ export declare class Stumblechat {
     _room: any;
     _ws: any;
     _username: string;
+    _logger: any;
     constructor(o?: any);
     _makeAgent(): SocksProxyAgent | HttpsProxyAgent<any>;
     toObject(): {

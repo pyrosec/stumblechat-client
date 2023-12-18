@@ -56,7 +56,13 @@ export const createLogger = (proc?: string) => {
       })
     ]
   });
-
+  ['debug', 'error', 'info'].forEach((v) => {
+    const method = logger[v];
+    logger[v] = function (...args) {
+      const formatted = util.format(...args);
+      return method.call(logger, formatted);
+    };
+  });
   return logger;
 };
 
